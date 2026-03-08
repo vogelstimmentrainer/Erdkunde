@@ -45,8 +45,9 @@ body {
   justify-content: center;
   padding: 30px 20px;
   background:
-    linear-gradient(to bottom, rgba(10,25,41,0.55) 0%, rgba(10,25,41,0.7) 100%),
-    url('ErdkundeStart.png') center center / cover no-repeat;
+    linear-gradient(to bottom, rgba(10,25,41,0.45) 0%, rgba(10,25,41,0.6) 100%),
+    url('ErdkundeStart.png') center center / contain no-repeat,
+    #0a1929;
   position: relative;
   overflow: hidden;
   gap: 8px;
@@ -1827,7 +1828,7 @@ function showResult() {
     badge.style.display = 'block';
     document.getElementById('passedSub').textContent = mod.title + ' erfolgreich abgeschlossen!';
     modsDone[curModule] = true;
-    totalScore += correct * 10;
+    totalScore += correct;
   } else {
     badge.style.display = 'none';
   }
