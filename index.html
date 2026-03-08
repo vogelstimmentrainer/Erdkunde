@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas-Führerschein</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean: #1565c0;
+  --ocean-light: #1e88e5;
+  --land: #2e7d32;
+  --land-light: #43a047;
+  --sand: #f9f3e3;
+  --gold: #f9a825;
+  --gold-dark: #c67c00;
+  --red: #c62828;
+  --red-light: #e53935;
+  --bg: #0a1929;
+  --card: #0d2137;
+  --card2: #112840;
+  --border: rgba(255,255,255,0.1);
+  --text: #e8f4fd;
+  --muted: #7fb3cc;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ══════════════════════════════════════
+   STARTSCREEN
+══════════════════════════════════════ */
+#startScreen {
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  background:
+    linear-gradient(to bottom, rgba(10,25,41,0.55) 0%, rgba(10,25,41,0.7) 100%),
+    url('ErdkundeStart.png') center center / cover no-repeat;
+  position: relative;
+  overflow: hidden;
+  gap: 8px;
+}
+
+.heroIcon { display: none; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+.heroTitle {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(30px,7vw,64px);
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #64b5f6, #81c784);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.heroSub {
+  font-size: clamp(13px,2.5vw,18px);
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.moduleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 14px;
+  width: min(860px,94vw);
+}
+.moduleCard {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 18px;
+  cursor: pointer;
+  transition: transform .2s, border-color .2s, background .2s;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.moduleCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
+  pointer-events: none;
+}
+.moduleCard:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.3); background: var(--card2); }
+.moduleCard .mIcon { font-size: 40px; margin-bottom: 8px; }
+.moduleCard h3 {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(16px,2.2vw,20px);
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+.moduleCard p { font-size: clamp(11px,1.6vw,13px); color: var(--muted); line-height: 1.4; }
+.mBadge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 20px;
+  margin-top: 10px;
+}
+.badge-open   { background: var(--gold);       color: #1a1a1a; }
+.badge-done   { background: var(--land-light);  color: white; }
+.badge-failed { background: var(--red-light);   color: white; }
+
+.topRowBtns {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.topBtn {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(14px,2vw,18px);
+  font-weight: 800;
+  padding: 12px 28px;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: rgba(255,255,255,0.07);
+  color: white;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.topBtn:hover { background: rgba(255,255,255,0.14); }
+.topBtn.gold { background: linear-gradient(135deg,var(--gold),var(--gold-dark)); border-color: transparent; color: #1a1a1a; display:none; }
+
+/* ══════════════════════════════════════
+   QUIZ SCREEN
+══════════════════════════════════════ */
+#quizScreen {
+  align-items: center;
+  padding: 16px 14px 50px;
+}
+.quizInner {
+  width: min(820px,100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.quizTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.iconBtn {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(14px,2vw,18px);
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  cursor: pointer;
+  transition: background .2s;
+}
+.iconBtn:hover { background: rgba(255,255,255,0.16); }
+
+.quizModTitle {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(16px,2.5vw,24px);
+  font-weight: 800;
+}
+.quizProgress { font-size: 15px; color: var(--muted); font-weight: 700; }
+
+.progressBar {
+  height: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 30px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ocean-light), var(--land-light));
+  border-radius: 30px;
+  transition: width .5s ease;
+}
+
+/* SCORE LIVE */
+.liveScore {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.liveScoreBadge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+}
+.liveScoreBadge.green { background: rgba(46,204,113,0.2); border-color: #2ecc71; }
+.liveScoreBadge.red   { background: rgba(231,76,60,0.2);  border-color: #e74c3c; }
+
+/* QUESTION CARD */
+.qCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: clamp(18px,4vw,34px);
+  animation: qIn .3s ease;
+}
+@keyframes qIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+.qTypeTag {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.tag-multiple   { background: rgba(30,136,229,0.25); color: #64b5f6; border: 1px solid #1e88e5; }
+.tag-masstab    { background: rgba(249,168,37,0.2);  color: #ffd54f; border: 1px solid #f9a825; }
+.tag-search     { background: rgba(46,125,50,0.25);  color: #81c784; border: 1px solid #2e7d32; }
+.tag-kartentyp  { background: rgba(142,36,170,0.25); color: #ce93d8; border: 1px solid #7b1fa2; }
+
+.qText {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(18px,3.2vw,28px);
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 18px;
+}
+
+/* IMAGE */
+.qImage {
+  width: 100%;
+  max-width: 560px;
+  border-radius: 14px;
+  margin: 0 auto 18px;
+  display: block;
+  border: 2px solid var(--border);
+  background: var(--card2);
+  min-height: 160px;
+  object-fit: cover;
+}
+.qImagePlaceholder {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto 18px;
+  border-radius: 14px;
+  border: 2px dashed rgba(255,255,255,0.2);
+  background: var(--card2);
+  padding: 28px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.qImagePlaceholder .pIcon { font-size: 36px; }
+
+/* CHOICES */
+.choicesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media(max-width:480px){ .choicesGrid { grid-template-columns: 1fr; } }
+
+.choiceBtn {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(14px,2vw,19px);
+  font-weight: 700;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.13);
+  background: rgba(255,255,255,0.06);
+  color: white;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.choiceBtn:hover:not(:disabled) { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.28); transform: translateX(3px); }
+.choiceLtr {
+  min-width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  flex-shrink: 0;
+}
+.choiceBtn.correct { background: rgba(46,204,113,0.22)!important; border-color: #2ecc71!important; }
+.choiceBtn.correct .choiceLtr { background: #2ecc71; }
+.choiceBtn.wrong   { background: rgba(231,76,60,0.22)!important;  border-color: #e74c3c!important; }
+.choiceBtn.wrong   .choiceLtr { background: #e74c3c; }
+
+/* MASSTAB INPUT */
+.masstabBox {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.masstabInfo {
+  font-size: clamp(13px,1.8vw,16px);
+  color: var(--muted);
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.masstabInfo strong { color: var(--gold); }
+
+/* FORMEL */
+.formelBox {
+  background: rgba(249,168,37,0.08);
+  border: 2px solid rgba(249,168,37,0.35);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: clamp(13px,1.8vw,16px);
+}
+.formelTitle {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.formelStep {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 4px 0;
+  font-weight: 700;
+}
+.fNum    { background: rgba(249,168,37,0.2); color: var(--gold); font-weight: 800; padding: 2px 10px; border-radius: 8px; }
+.fOp     { color: var(--muted); font-size: 18px; }
+.fBlank  { background: rgba(255,255,255,0.08); border: 2px dashed rgba(255,255,255,0.25); color: rgba(255,255,255,0.35); font-weight: 800; padding: 2px 16px; border-radius: 8px; min-width: 56px; text-align: center; }
+.fResult { color: #81c784; font-weight: 800; }
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.numInput {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(18px,3vw,26px);
+  font-weight: 800;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  width: clamp(120px,30%,200px);
+  text-align: center;
+}
+.numInput:focus { outline: none; border-color: var(--gold); }
+.inputUnit { font-size: clamp(14px,2vw,18px); color: var(--muted); font-weight: 700; }
+
+/* TASCHENRECHNER */
+.calcWrap { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px; }
+.calcToggle {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  margin-bottom: 12px;
+}
+.calcToggle:hover { background: rgba(255,255,255,0.12); color: white; }
+.calculator { display: none; background: #0a1520; border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 14px; max-width: 290px; }
+.calculator.open { display: block; }
+.calcDisplay { background: rgba(0,0,0,0.4); border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; text-align: right; }
+.calcExpr { font-size: 12px; color: var(--muted); min-height: 18px; word-break: break-all; }
+.calcVal  { font-size: clamp(22px,5vw,32px); font-weight: 800; color: white; word-break: break-all; }
+.calcBtns { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; }
+.cBtn {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(15px,2.5vw,19px);
+  font-weight: 800;
+  padding: 13px 6px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: filter .1s, transform .1s;
+  user-select: none;
+}
+.cBtn:active { transform: scale(0.91); filter: brightness(1.3); }
+.cBtn.num  { background: #1e3a5f; color: white; }
+.cBtn.op   { background: #1565c0; color: white; }
+.cBtn.eq   { background: var(--gold); color: #1a1a1a; }
+.cBtn.clr  { background: #7b1fa2; color: white; }
+.cBtn.del  { background: #37474f; color: white; }
+.cBtn.zero { grid-column: span 2; }
+
+/* SEARCH INPUT */
+.searchBox {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.searchHint {
+  font-size: clamp(13px,1.8vw,15px);
+  color: var(--muted);
+  margin-bottom: 14px;
+  line-height: 1.6;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  border-left: 3px solid var(--gold);
+}
+.searchHint .atlasRef { color: var(--gold); font-weight: 800; }
+.textInput {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(16px,2.5vw,22px);
+  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  width: 100%;
+}
+.textInput:focus { outline: none; border-color: var(--ocean-light); }
+
+/* FEEDBACK */
+.feedback {
+  display: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-top: 14px;
+  font-size: clamp(14px,2vw,17px);
+  font-weight: 700;
+  line-height: 1.5;
+  animation: fadeIn .25s;
+}
+@keyframes fadeIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
+.feedback.correct { background: rgba(46,204,113,0.15); border: 2px solid #2ecc71; }
+.feedback.wrong   { background: rgba(231,76,60,0.15);  border: 2px solid #e74c3c; }
+
+.actionBtns { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.submitBtn {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(16px,2.5vw,22px);
+  font-weight: 800;
+  padding: 13px 36px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg,var(--ocean),var(--ocean-light));
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.3);
+  transition: transform .1s, box-shadow .1s;
+  display: none;
+}
+.submitBtn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+.nextBtn {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(16px,2.5vw,22px);
+  font-weight: 800;
+  padding: 13px 36px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg,var(--land),var(--land-light));
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.3);
+  transition: transform .1s, box-shadow .1s;
+  display: none;
+}
+.nextBtn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+
+/* ══════════════════════════════════════
+   RESULT SCREEN
+══════════════════════════════════════ */
+#resultScreen {
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  background: radial-gradient(ellipse at center, #0d3b6e 0%, #0a1929 65%);
+}
+.resultCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  padding: clamp(24px,5vw,48px);
+  width: min(540px,94vw);
+  text-align: center;
+}
+.resultEmoji { font-size: clamp(60px,14vw,96px); margin-bottom: 8px; }
+.resultTitle {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(24px,5vw,40px);
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.resultScore { font-size: clamp(44px,10vw,72px); font-weight: 800; color: var(--gold); }
+.resultMsg   { font-size: clamp(13px,2vw,17px); color: var(--muted); margin: 10px 0 16px; line-height: 1.5; }
+
+.passedBadge {
+  background: linear-gradient(135deg,var(--gold),var(--gold-dark));
+  border-radius: 16px;
+  padding: 16px;
+  margin: 14px 0;
+  display: none;
+}
+.passedBadge .pbt {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(18px,3vw,26px);
+  font-weight: 800;
+  color: #1a1a1a;
+}
+.passedBadge .pbs { font-size: 13px; color: rgba(0,0,0,0.65); margin-top: 3px; }
+
+.resultBtns { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.rBtn {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(16px,2.5vw,22px);
+  font-weight: 800;
+  padding: 13px 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  transition: transform .1s;
+}
+.rBtn:active { transform: translateY(3px); }
+.rBtn.retry { background: linear-gradient(135deg,var(--ocean),var(--ocean-light)); }
+.rBtn.home  { background: rgba(255,255,255,0.08); border: 1px solid var(--border); }
+.rBtn.score { background: linear-gradient(135deg,#7b1fa2,#ab47bc); }
+
+/* ══════════════════════════════════════
+   HIGHSCORE OVERLAY
+══════════════════════════════════════ */
+#highscoreOverlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.93);
+  z-index: 300;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  overflow-y: auto;
+}
+#highscoreOverlay.open { display: flex; }
+.hsCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: clamp(20px,4vw,40px);
+  width: min(500px,94vw);
+  text-align: center;
+}
+.hsTitle {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(24px,5vw,38px);
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+/* TABS */
+.hsTabs {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.hsTab {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(13px,2vw,16px);
+  font-weight: 800;
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.hsTab:hover { background: rgba(255,255,255,0.12); color: white; }
+.hsTab.active {
+  background: linear-gradient(135deg,var(--ocean),var(--ocean-light));
+  border-color: transparent;
+  color: white;
+}
+
+.hsSub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+#hsList { font-size: clamp(14px,2.2vw,19px); line-height: 1.9; text-align: left; min-height: 60px; }
+.hsEntry { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 8px; }
+.hsEntry .hsRank { font-size: 18px; min-width: 28px; }
+.hsEntry .hsName { font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hsEntry .hsMod  { font-size: 12px; color: var(--muted); }
+.hsEntry .hsPts  { color: var(--gold); font-weight: 800; white-space: nowrap; }
+
+/* SAVE SCORE */
+.saveRow { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.nameInput {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(16px,2.5vw,20px);
+  font-weight: 700;
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  flex: 1;
+  min-width: 140px;
+}
+.nameInput:focus { outline: none; border-color: var(--gold); }
+.saveBtn {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(15px,2vw,19px);
+  font-weight: 800;
+  padding: 11px 24px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg,var(--gold),var(--gold-dark));
+  color: #1a1a1a;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════
+   NAME OVERLAY
+══════════════════════════════════════ */
+#nameOverlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+}
+#nameOverlay.open { display: flex; }
+.nameCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  padding: clamp(28px,5vw,50px);
+  width: min(420px,94vw);
+  text-align: center;
+  animation: qIn .3s ease;
+}
+.nameCardIcon  { font-size: 56px; margin-bottom: 10px; }
+.nameCardTitle {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(22px,4vw,32px);
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.nameCardSub {
+  font-size: clamp(13px,2vw,16px);
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+.nameCardInput {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(18px,3vw,24px);
+  font-weight: 700;
+  padding: 13px 18px;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 16px;
+  display: block;
+}
+.nameCardInput:focus { outline: none; border-color: var(--gold); }
+.nameCardBtn {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(18px,3vw,24px);
+  font-weight: 800;
+  padding: 14px 40px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, var(--land), var(--land-light));
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.3);
+  transition: transform .1s, box-shadow .1s;
+  width: 100%;
+}
+.nameCardBtn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     STARTSCREEN
+════════════════════════════════ -->
+<div id="startScreen" class="screen active">
+  <div class="heroIcon">🌍</div>
+  <div class="heroTitle">Atlas-Führerschein</div>
+  <div class="heroSub">Diercke Weltatlas · Klasse 5 / 6</div>
+
+  <div class="topRowBtns">
+    <button class="topBtn" onclick="openHighscore()">🏆 Highscore</button>
+    <button class="topBtn gold" id="certBtn" onclick="showCert()">🎓 Führerschein!</button>
+  </div>
+
+  <div class="moduleGrid">
+
+    <div class="moduleCard" onclick="startModule('physisch')" id="mc-physisch">
+      <div class="mIcon">🏔️</div>
+      <h3>Physische Karte</h3>
+      <p>Gebirge, Flüsse, Meere & Landformen erkennen und benennen</p>
+      <div class="mBadge badge-open" id="mb-physisch">Starten</div>
+    </div>
+
+    <div class="moduleCard" onclick="startModule('masstab')" id="mc-masstab">
+      <div class="mIcon">📏</div>
+      <h3>Maßstab & Entfernung</h3>
+      <p>Kartenmessungen mit dem Maßstab in echte Distanzen umrechnen</p>
+      <div class="mBadge badge-open" id="mb-masstab">Starten</div>
+    </div>
+
+    <div class="moduleCard" onclick="startModule('suchen')" id="mc-suchen">
+      <div class="mIcon">🔍</div>
+      <h3>Atlas-Suchaufgaben</h3>
+      <p>Im Diercke nachschlagen und Antworten finden</p>
+      <div class="mBadge badge-open" id="mb-suchen">Starten</div>
+    </div>
+
+    <div class="moduleCard" onclick="startModule('thematisch')" id="mc-thematisch">
+      <div class="mIcon">🌾</div>
+      <h3>Thematische Karten</h3>
+      <p>Klima, Landwirtschaft & Bevölkerung aus Karten ablesen</p>
+      <div class="mBadge badge-open" id="mb-thematisch">Starten</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     NAME OVERLAY
+════════════════════════════════ -->
+<div id="nameOverlay">
+  <div class="nameCard">
+    <div class="nameCardIcon" id="nameCardIcon"></div>
+    <div class="nameCardTitle" id="nameCardTitle"></div>
+    <div class="nameCardSub">Gib deinen Namen ein, bevor es losgeht!</div>
+    <input class="nameCardInput" id="nameCardInput" type="text" placeholder="Dein Name..." maxlength="30" autocomplete="off">
+    <button class="nameCardBtn" id="nameCardBtn" onclick="confirmName()">Los geht's! →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     QUIZ SCREEN
+════════════════════════════════ -->
+<div id="quizScreen" class="screen">
+  <div class="quizInner">
+    <div class="quizTopBar">
+      <button class="iconBtn" onclick="goHome()">⬅ Zurück</button>
+      <div class="quizModTitle" id="quizTitle"></div>
+      <div class="quizProgress" id="quizProg"></div>
+    </div>
+    <div class="progressBar"><div class="progressFill" id="progFill"></div></div>
+    <div class="liveScore">
+      <div class="liveScoreBadge green" id="lsCorrect">✅ 0 richtig</div>
+      <div class="liveScoreBadge red"   id="lsWrong">❌ 0 falsch</div>
+    </div>
+    <div class="qCard" id="qCard">
+      <div class="qTypeTag" id="qTypeTag"></div>
+      <div class="qText" id="qText"></div>
+      <div id="qImage"></div>
+      <div id="qBody"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actionBtns">
+        <button class="submitBtn" id="submitBtn" onclick="checkInput()">✔ Prüfen</button>
+        <button class="nextBtn"   id="nextBtn"   onclick="nextQ()">Weiter →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     RESULT SCREEN
+════════════════════════════════ -->
+<div id="resultScreen" class="screen">
+  <div class="resultCard">
+    <div class="resultEmoji" id="rEmoji"></div>
+    <div class="resultTitle"  id="rTitle"></div>
+    <div class="resultScore"  id="rScore"></div>
+    <div class="resultMsg"    id="rMsg"></div>
+    <div class="passedBadge"  id="passedBadge">
+      <div class="pbt">🏅 Modul bestanden!</div>
+      <div class="pbs" id="passedSub"></div>
+    </div>
+    <div class="resultBtns">
+      <button class="rBtn retry" onclick="retryMod()">🔁 Nochmal</button>
+      <button class="rBtn score" onclick="openHighscore()">🏆 Highscore</button>
+      <button class="rBtn home"  onclick="goHome()">🏠 Zur Übersicht</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     HIGHSCORE OVERLAY
+════════════════════════════════ -->
+<div id="highscoreOverlay">
+  <div class="hsCard">
+    <div class="hsTitle">🏆 Highscore</div>
+
+    <!-- Filter Tabs -->
+    <div class="hsTabs">
+      <button class="hsTab active" onclick="switchTab('alle')"    id="tab-alle">🌍 Alle</button>
+      <button class="hsTab"        onclick="switchTab('physisch')" id="tab-physisch">🏔️</button>
+      <button class="hsTab"        onclick="switchTab('masstab')"  id="tab-masstab">📏</button>
+      <button class="hsTab"        onclick="switchTab('suchen')"   id="tab-suchen">🔍</button>
+      <button class="hsTab"        onclick="switchTab('thematisch')" id="tab-thematisch">🌾</button>
+    </div>
+    <div class="hsSub" id="hsSubTitle">Alle Module</div>
+
+    <div id="hsList">Lade...</div>
+
+    <div style="margin-top:14px">
+      <button class="iconBtn" onclick="closeHighscore()">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE SHEETS URL
+// ═══════════════════════════════════════════════════════════
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7SJ1AO8MLfNBj2agmbL02KoX0MBQ2szJO0KgeVMqVAQvnCnnipulO9WCkgJ9ErP_z/exec";
+
+// ═══════════════════════════════════════════════════════════
+//  FRAGEN-DATENBANK
+//
+//  Bildpfade: Lege Bilder im selben Ordner ab und trage
+//  den Dateinamen ein z.B. image: "karte_alpen.jpg"
+//  Ohne Bild: image: null
+// ═══════════════════════════════════════════════════════════
+const MODULES = {
+
+  // ──────────────────────────────────────────────────────
+  physisch: {
+    title: "🏔️ Physische Karte",
+    icon: "🏔️",
+    passMark: 7,
+    total: 10,
+    questions: [
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Welches ist das höchste Gebirge der Erde?",
+        image: null,
+        choices: ["Alpen", "Anden", "Himalaya", "Rocky Mountains"],
+        answer: 2,
+        explanation: "Der Himalaya in Asien ist mit dem Mount Everest (8.849 m) das höchste Gebirge der Erde."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Welcher Fluss ist der längste der Erde?",
+        image: null,
+        choices: ["Amazonas", "Nil", "Mississippi", "Yangtze"],
+        answer: 1,
+        explanation: "Der Nil in Afrika gilt mit ca. 6.650 km als längster Fluss der Erde."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Wie nennt man die höchste Erhebung eines Gebirges?",
+        image: null,
+        choices: ["Tal", "Pass", "Gipfel", "Hang"],
+        answer: 2,
+        explanation: "Den höchsten Punkt eines Gebirges nennt man Gipfel oder Bergspitze."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Was zeigen blaue Flächen auf einer physischen Karte?",
+        image: null,
+        choices: ["Gebirge", "Wüsten", "Gewässer (Seen & Meere)", "Wälder"],
+        answer: 2,
+        explanation: "Auf physischen Karten werden Gewässer – also Seen, Flüsse und Meere – immer blau dargestellt."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Was bedeutet es, wenn eine Fläche auf der physischen Karte dunkelbraun dargestellt ist?",
+        image: null,
+        choices: ["Tiefstes Tal", "Hohes Gebirge", "Ebene", "Wüste"],
+        answer: 1,
+        explanation: "Dunkelbraun steht für große Höhen – also Hochgebirge. Je dunkler, desto höher."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Welches Gebirge liegt in der Mitte Europas und trennt Deutschland von Österreich?",
+        image: null,
+        choices: ["Pyrenäen", "Karpaten", "Alpen", "Apennin"],
+        answer: 2,
+        explanation: "Die Alpen erstrecken sich durch die Mitte Europas und bilden die Grenze zwischen Deutschland und Österreich."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Wie heißt die größte Wüste der Erde?",
+        image: null,
+        choices: ["Gobi", "Namib", "Sahara", "Atacama"],
+        answer: 2,
+        explanation: "Die Sahara in Nordafrika ist mit über 9 Millionen km² die größte Wüste der Erde."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Was ist ein Tiefland?",
+        image: null,
+        choices: [
+          "Ein Gebiet über 2000 m Höhe",
+          "Ein Gebiet unter 200 m Höhe",
+          "Ein Gebiet im Meer",
+          "Ein Gebirgszug"
+        ],
+        answer: 1,
+        explanation: "Als Tiefland bezeichnet man Gebiete, die weniger als 200 m über dem Meeresspiegel liegen."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Wie nennt man den tiefsten Punkt der Erde?",
+        image: null,
+        choices: ["Atlantischer Graben", "Marianen-Graben", "Tiefsee-Tal", "Pazifische Senke"],
+        answer: 1,
+        explanation: "Der Marianen-Graben im Pazifik ist mit ca. 11.000 m der tiefste Punkt der Erde."
+      },
+      {
+        type: "multiple",
+        tag: "Physische Karte",
+        tagClass: "tag-multiple",
+        question: "Welche Farbe hat auf physischen Karten tiefes Meeresgebiet?",
+        image: null,
+        choices: ["Hellblau", "Grün", "Dunkelblau", "Türkis"],
+        answer: 2,
+        explanation: "Auf physischen Karten wird tiefes Wasser dunkelblau dargestellt. Je dunkler, desto tiefer."
+      }
+    ]
+  },
+
+  // ──────────────────────────────────────────────────────
+  masstab: {
+    title: "📏 Maßstab & Entfernung",
+    icon: "📏",
+    passMark: 6,
+    total: 8,
+    questions: [
+      {
+        type: "masstab",
+        tag: "Maßstab rechnen",
+        tagClass: "tag-masstab",
+        question: "Du misst auf der Karte eine Strecke von 3 cm. Der Maßstab ist 1 : 1.000.000. Wie weit ist die Strecke in der Realität?",
+        image: "Erdkunde2.png",
+        masstab: "1 : 1.000.000",
+        gemessen: 3,
+        einheit: "km",
+        realKm: 30,
+        toleranz: 2,
+        erklaerung: "3 cm × 10 = 30 km. Bei 1:1.000.000 entspricht 1 cm = 10 km."
+      },
+      {
+        type: "masstab",
+        tag: "Maßstab rechnen",
+        tagClass: "tag-masstab",
+        question: "Auf der Karte misst du 5 cm. Der Maßstab ist 1 : 2.000.000. Wie viele Kilometer sind das in Wirklichkeit?",
+        image: "Erdkunde2.png",
+        masstab: "1 : 2.000.000",
+        gemessen: 5,
+        einheit: "km",
+        realKm: 100,
+        toleranz: 5,
+        erklaerung: "5 cm × 20 = 100 km. Bei 1:2.000.000 entspricht 1 cm = 20 km."
+      },
+      {
+        type: "masstab",
+        tag: "Maßstab rechnen",
+        tagClass: "tag-masstab",
+        question: "Eine Strecke ist auf der Karte 4 cm lang. Der Maßstab beträgt 1 : 500.000. Wie lang ist sie wirklich?",
+        image: "Erdkunde2.png",
+        masstab: "1 : 500.000",
+        gemessen: 4,
+        einheit: "km",
+        realKm: 20,
+        toleranz: 1,
+        erklaerung: "4 cm × 5 = 20 km. Bei 1:500.000 entspricht 1 cm = 5 km."
+      },
+      {
+        type: "masstab",
+        tag: "Maßstab rechnen",
+        tagClass: "tag-masstab",
+        question: "Du misst 2 cm auf einer Karte mit dem Maßstab 1 : 1.000.000. Wie weit ist das in km?",
+        image: "Erdkunde2.png",
+        masstab: "1 : 1.000.000",
+        gemessen: 2,
+        einheit: "km",
+        realKm: 20,
+        toleranz: 1,
+        erklaerung: "2 cm × 10 = 20 km. Bei 1:1.000.000 entspricht 1 cm = 10 km."
+      },
+      {
+        type: "multiple",
+        tag: "Maßstab verstehen",
+        tagClass: "tag-masstab",
+        question: "Was bedeutet der Maßstab 1 : 1.000.000?",
+        image: null,
+        choices: [
+          "1 km auf der Karte = 1.000.000 km in der Realität",
+          "1 cm auf der Karte = 10 km in der Realität",
+          "1 cm auf der Karte = 1.000.000 cm = 10 km in der Realität",
+          "1 m auf der Karte = 1 km in der Realität"
+        ],
+        answer: 2,
+        explanation: "1 : 1.000.000 bedeutet: 1 cm auf der Karte entspricht 1.000.000 cm = 10 km in der Realität."
+      },
+      {
+        type: "multiple",
+        tag: "Maßstab verstehen",
+        tagClass: "tag-masstab",
+        question: "Welcher Maßstab zeigt einen größeren Ausschnitt der Erde auf gleich großem Papier?",
+        image: null,
+        choices: [
+          "1 : 50.000 (großmaßstäbig)",
+          "1 : 10.000.000 (kleinmaßstäbig)",
+          "Beide zeigen gleich viel",
+          "Es kommt auf das Papier an"
+        ],
+        answer: 1,
+        explanation: "Ein kleiner Maßstab (z.B. 1 : 10.000.000) zeigt einen sehr großen Bereich – z.B. einen ganzen Kontinent."
+      },
+      {
+        type: "masstab",
+        tag: "Maßstab rechnen",
+        tagClass: "tag-masstab",
+        question: "Die Entfernung Berlin–München beträgt in Wirklichkeit 585 km. Auf einer Karte mit 1 : 10.000.000 – wie viele cm sind das auf der Karte? (Runde auf ganze cm)",
+        image: null,
+        masstab: "1 : 10.000.000",
+        gemessen: null,
+        einheit: "cm (auf der Karte)",
+        realKm: 5.85,
+        toleranz: 0.5,
+        erklaerung: "585 km = 58.500.000 cm ÷ 10.000.000 = 5,85 cm ≈ 6 cm",
+        hint: "Formel: reale km × 100.000 ÷ Maßstabszahl = cm auf Karte",
+        istUmgekehrt: true,
+        realInput: 585,
+        realTolerance: 50
+      },
+      {
+        type: "multiple",
+        tag: "Maßstab verstehen",
+        tagClass: "tag-masstab",
+        question: "Was ist ein 'großmaßstäbiger' Atlas-Ausschnitt?",
+        image: null,
+        choices: [
+          "Eine Karte, die sehr viel vom Erdball zeigt",
+          "Eine Karte mit kleiner Maßstabszahl (z.B. 1:25.000), die viele Details zeigt",
+          "Eine Karte für Ozeane",
+          "Eine Karte ohne Maßstab"
+        ],
+        answer: 1,
+        explanation: "Großmaßstäbig = kleine Maßstabszahl = großer Detailgrad, kleiner Ausschnitt (z.B. Stadtplan 1:25.000)."
+      }
+    ]
+  },
+
+  // ──────────────────────────────────────────────────────
+  suchen: {
+    title: "🔍 Atlas-Suchaufgaben",
+    icon: "🔍",
+    passMark: 6,
+    total: 9,
+    questions: [
+      {
+        type: "search",
+        tag: "Atlas nachschlagen",
+        tagClass: "tag-search",
+        question: "Schlage im Diercke-Atlas die Europakarte auf. Welche Hauptstadt liegt am Fluss Seine?",
+        image: "Europa.jpeg",
+        atlasHinweis: "📖 Diercke Weltatlas · Europakarte (physisch/politisch) · Frankreich",
+        answer: ["paris"],
+        answerDisplay: "Paris",
+        explanation: "Paris liegt an der Seine. Die Seine fließt durch die französische Hauptstadt und mündet in den Ärmelkanal.",
+        acceptPartial: false
+      },
+      {
+        type: "search",
+        tag: "Atlas nachschlagen",
+        tagClass: "tag-search",
+        question: "Schaue auf die Weltkarte im Atlas. Welches Meer liegt zwischen Europa und Afrika?",
+        image: "Europa.jpeg",
+        atlasHinweis: "📖 Diercke Weltatlas · Weltkarte (physisch) · Europa / Afrika",
+        answer: ["mittelmeer", "mediterranes meer"],
+        answerDisplay: "Mittelmeer",
+        explanation: "Das Mittelmeer (auch Mediterranes Meer) liegt zwischen Europa im Norden und Afrika im Süden.",
+        acceptPartial: true
+      },
+      {
+        type: "multiple",
+        tag: "Atlas-Wissen",
+        tagClass: "tag-search",
+        question: "Was ist ein Register im Atlas und wofür braucht man es?",
+        image: null,
+        choices: [
+          "Eine Karte von einem Land",
+          "Ein alphabetisches Verzeichnis aller Orte mit Seitenzahl",
+          "Die Legende einer Karte",
+          "Eine Liste aller Kontinente"
+        ],
+        answer: 1,
+        explanation: "Das Register (Ortsregister) ist am hinteren Ende des Atlas. Es listet alle Orte alphabetisch mit Seite und Koordinaten."
+      },
+      {
+        type: "search",
+        tag: "Atlas nachschlagen",
+        tagClass: "tag-search",
+        question: "Suche im Diercke-Atlas: Welches Land liegt vollständig als Insel im Indischen Ozean (östlich von Afrika)?",
+        image: null,
+        atlasHinweis: "📖 Diercke Weltatlas · Afrika-Karte · Östlicher Bereich",
+        answer: ["madagaskar"],
+        answerDisplay: "Madagaskar",
+        explanation: "Madagaskar ist die viertgrößte Insel der Welt und liegt im Indischen Ozean östlich von Mosambik.",
+        acceptPartial: false
+      },
+      {
+        type: "search",
+        tag: "Atlas nachschlagen",
+        tagClass: "tag-search",
+        question: "Schaue auf die Europakarte. Welches Gebirge bildet die Grenze zwischen Spanien und Frankreich?",
+        image: "Europa.jpeg",
+        atlasHinweis: "📖 Diercke Weltatlas · Europakarte (physisch) · Südwesteuropa",
+        answer: ["pyrenäen", "pyrenaen", "pyreneen"],
+        answerDisplay: "Pyrenäen",
+        explanation: "Die Pyrenäen sind das Gebirge an der Grenze zwischen Spanien und Frankreich.",
+        acceptPartial: true
+      },
+      {
+        type: "multiple",
+        tag: "Atlas-Wissen",
+        tagClass: "tag-search",
+        question: "Wofür steht die Legende in einer Karte?",
+        image: null,
+        choices: [
+          "Sie erklärt alle verwendeten Farben, Symbole und Zeichen",
+          "Sie zeigt den Maßstab",
+          "Sie nennt den Namen des Kartenherstellers",
+          "Sie zeigt die Himmelsrichtungen"
+        ],
+        answer: 0,
+        explanation: "Die Legende (auch Kartenzeichen-Erklärung) erklärt, was alle Farben, Symbole und Linien auf der Karte bedeuten."
+      },
+      {
+        type: "search",
+        tag: "Atlas nachschlagen",
+        tagClass: "tag-search",
+        question: "Schlage die Asienkarte auf. Wie heißt der längste Fluss Chinas?",
+        image: "China.jpeg",
+        atlasHinweis: "📖 Diercke Weltatlas · Asienkarte (physisch) · China",
+        answer: ["yangtze", "chang jiang", "jangtsekiang"],
+        answerDisplay: "Yangtze (Chang Jiang)",
+        explanation: "Der Yangtze (auch Chang Jiang oder Jangtsekiang) ist mit 6.380 km der längste Fluss Chinas.",
+        acceptPartial: true
+      },
+      {
+        type: "multiple",
+        tag: "Atlas-Wissen",
+        tagClass: "tag-search",
+        question: "Was zeigen die konzentrischen Linien (Höhenlinien) auf einer physischen Karte?",
+        image: null,
+        choices: [
+          "Entfernungen zwischen Städten",
+          "Klimazonen",
+          "Gebiete gleicher Höhe über dem Meeresspiegel",
+          "Landesgrenzen"
+        ],
+        answer: 2,
+        explanation: "Höhenlinien verbinden alle Punkte gleicher Höhe. Liegen sie eng zusammen, ist das Gelände steil."
+      },
+      {
+        type: "search",
+        tag: "Atlas nachschlagen",
+        tagClass: "tag-search",
+        question: "Schlage im Atlas die Nordamerikakarte auf. Welcher See liegt an der Grenze zwischen USA und Kanada? (Es gibt mehrere – nenne einen Großen See)",
+        image: null,
+        atlasHinweis: "📖 Diercke Weltatlas · Nordamerikakarte · Grenzgebiet USA/Kanada",
+        answer: ["ontario", "superior", "michigan", "huron", "erie", "großer see"],
+        answerDisplay: "Ontario / Superior / Michigan / Huron / Erie",
+        explanation: "Die Großen Seen an der US-kanadischen Grenze heißen: Superior, Michigan, Huron, Erie und Ontario.",
+        acceptPartial: true
+      }
+    ]
+  },
+
+  // ──────────────────────────────────────────────────────
+  thematisch: {
+    title: "🌾 Thematische Karten",
+    icon: "🌾",
+    passMark: 7,
+    total: 10,
+    questions: [
+      {
+        type: "multiple",
+        tag: "Thematische Karte",
+        tagClass: "tag-kartentyp",
+        question: "Was zeigt eine thematische Karte im Gegensatz zu einer physischen Karte?",
+        image: null,
+        choices: [
+          "Nur Berge und Täler",
+          "Nur politische Grenzen",
+          "Einen bestimmten Sachverhalt, z.B. Klima, Landwirtschaft oder Bevölkerung",
+          "Nur den Maßstab"
+        ],
+        answer: 2,
+        explanation: "Thematische Karten zeigen einen speziellen Inhalt (Thema), z.B. Klimazonen, Landnutzung oder Bevölkerungsdichte."
+      },
+      {
+        type: "multiple",
+        tag: "Landwirtschaft",
+        tagClass: "tag-kartentyp",
+        question: "In welchen Klimazonen findet man hauptsächlich Regenfeldbau (Ackerbau ohne Bewässerung)?",
+        image: null,
+        choices: [
+          "In Wüstengebieten",
+          "In gemäßigten und tropischen Regionen mit ausreichend Niederschlag",
+          "In Polargebieten",
+          "Nur in Europa"
+        ],
+        answer: 1,
+        explanation: "Regenfeldbau funktioniert dort, wo genug Regen fällt – vor allem in der gemäßigten Zone und in Tropen."
+      },
+      {
+        type: "multiple",
+        tag: "Klimakarte",
+        tagClass: "tag-kartentyp",
+        question: "Was zeigt eine Klimakarte hauptsächlich?",
+        image: null,
+        choices: [
+          "Höhe der Berge",
+          "Verbreitung von Klimazonen und Niederschlagsmengen",
+          "Politische Grenzen",
+          "Bevölkerungsdichte"
+        ],
+        answer: 1,
+        explanation: "Klimakarten zeigen Klimazonen, Temperaturen und Niederschlagsmengen in verschiedenen Regionen."
+      },
+      {
+        type: "multiple",
+        tag: "Landwirtschaft",
+        tagClass: "tag-kartentyp",
+        question: "Welche Landwirtschaftsform ist typisch für die Sahelzone in Afrika?",
+        image: null,
+        choices: [
+          "Intensive Landwirtschaft mit Maschinen",
+          "Nomadische Viehwirtschaft (Wanderhirten)",
+          "Reisanbau auf Nassfeldern",
+          "Forstwirtschaft"
+        ],
+        answer: 1,
+        explanation: "In der Sahelzone ist das Klima sehr trocken. Nomadische Viehzüchter ziehen mit ihren Herden auf der Suche nach Wasser und Weideland umher."
+      },
+      {
+        type: "multiple",
+        tag: "Klimakarte",
+        tagClass: "tag-kartentyp",
+        question: "Was bedeutet 'tropisches Klima' auf einer Klimakarte?",
+        image: null,
+        choices: [
+          "Sehr kalt, viel Schnee",
+          "Heiß und ganzjährig feucht, nahe am Äquator",
+          "Vier Jahreszeiten wie in Deutschland",
+          "Trocken und windig"
+        ],
+        answer: 1,
+        explanation: "Das tropische Klima nahe des Äquators ist ganzjährig heiß (über 18°C) und meist sehr feucht mit viel Regen."
+      },
+      {
+        type: "multiple",
+        tag: "Bevölkerung",
+        tagClass: "tag-kartentyp",
+        question: "Was zeigt eine Bevölkerungsdichte-Karte?",
+        image: null,
+        choices: [
+          "Wie viele Menschen pro km² in einem Gebiet leben",
+          "Die Altersstruktur der Bevölkerung",
+          "Die Sprachen eines Landes",
+          "Wie groß die Städte sind"
+        ],
+        answer: 0,
+        explanation: "Bevölkerungsdichte = Einwohner pro km². Dunklere Farben auf der Karte bedeuten meist mehr Menschen."
+      },
+      {
+        type: "multiple",
+        tag: "Landwirtschaft",
+        tagClass: "tag-kartentyp",
+        question: "In welcher Region der Erde wird am meisten Reis angebaut?",
+        image: null,
+        choices: [
+          "Nordamerika", "Europa", "Südost- und Ostasien", "Australien"
+        ],
+        answer: 2,
+        explanation: "Südost- und Ostasien (z.B. China, Indien, Indonesien) sind die Hauptanbaugebiete von Reis, der viel Wärme und Wasser braucht."
+      },
+      {
+        type: "multiple",
+        tag: "Thematische Karte",
+        tagClass: "tag-kartentyp",
+        question: "Was bedeuten unterschiedliche Farben auf einer Landnutzungskarte?",
+        image: null,
+        choices: [
+          "Verschiedene Höhenstufen",
+          "Unterschiedliche Arten der Bodennutzung (Wald, Acker, Weide, Siedlung...)",
+          "Klimazonen",
+          "Verschiedene Länder"
+        ],
+        answer: 1,
+        explanation: "Auf Landnutzungskarten zeigen Farben, wie der Boden genutzt wird: grün = Wald/Wiese, gelb = Acker, grau = Siedlung usw."
+      },
+      {
+        type: "multiple",
+        tag: "Klimakarte",
+        tagClass: "tag-kartentyp",
+        question: "Welches Klima herrscht in der Nähe der Pole?",
+        image: null,
+        choices: [
+          "Tropisches Klima", "Mediterranes Klima", "Polares Klima", "Wüstenklima"
+        ],
+        answer: 2,
+        explanation: "An den Polen herrscht polares Klima: extrem kalt, wenig Niederschlag, langer Winter."
+      },
+      {
+        type: "multiple",
+        tag: "Thematische Karte",
+        tagClass: "tag-kartentyp",
+        question: "Welches Symbol findet man auf einer Landwirtschaftskarte für Weideland?",
+        image: null,
+        choices: [
+          "Blaue Wellenlinien", "Grüne Punkte oder helles Grün", "Braune Schraffur", "Rote Kreuze"
+        ],
+        answer: 1,
+        explanation: "Weideland wird auf Landwirtschaftskarten oft in hellem Grün oder mit grünen Punkten dargestellt – die Legende gibt genaue Auskunft."
+      }
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+//  ZUSTAND
+// ═══════════════════════════════════════════════════════════
+let curModule  = null;
+let questions  = [];
+let curQ       = 0;
+let correct    = 0;
+let wrong      = 0;
+let answered   = false;
+let totalScore = 0;
+let scoreSaved = false;
+let modsDone   = {};
+let playerName = '';
+let pendingModule = null;
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome() { show('startScreen'); updateCards(); }
+
+function startModule(name) {
+  pendingModule = name;
+  const mod = MODULES[name];
+  // Name-Overlay anzeigen
+  document.getElementById('nameCardIcon').textContent  = mod.icon;
+  document.getElementById('nameCardTitle').textContent = mod.title;
+  // Vorherigen Namen vorausfüllen falls vorhanden
+  document.getElementById('nameCardInput').value = playerName || '';
+  document.getElementById('nameCardInput').style.borderColor = '';
+  document.getElementById('nameOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('nameCardInput').focus(), 100);
+}
+
+function confirmName() {
+  const val = document.getElementById('nameCardInput').value.trim();
+  if (!val) {
+    document.getElementById('nameCardInput').style.borderColor = '#e74c3c';
+    return;
+  }
+  playerName = val;
+  document.getElementById('nameOverlay').classList.remove('open');
+  // Modul starten
+  curModule = pendingModule;
+  const mod = MODULES[curModule];
+  questions = shuffle(mod.questions.slice());
+  curQ = 0; correct = 0; wrong = 0; answered = false; scoreSaved = false;
+  document.getElementById('quizTitle').textContent = mod.title;
+  show('quizScreen');
+  renderQ();
+}
+
+function retryMod() { startModule(curModule); }
+
+// ═══════════════════════════════════════════════════════════
+//  FRAGE RENDERN
+// ═══════════════════════════════════════════════════════════
+function renderQ() {
+  const q = questions[curQ];
+  const total = questions.length;
+  answered = false;
+
+  document.getElementById('quizProg').textContent = (curQ+1) + ' / ' + total;
+  document.getElementById('progFill').style.width = (curQ/total*100) + '%';
+  document.getElementById('lsCorrect').textContent = '✅ ' + correct + ' richtig';
+  document.getElementById('lsWrong').textContent   = '❌ ' + wrong  + ' falsch';
+  document.getElementById('qTypeTag').textContent  = q.tag;
+  document.getElementById('qTypeTag').className    = 'qTypeTag ' + q.tagClass;
+  document.getElementById('qText').textContent     = q.question;
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('nextBtn').style.display   = 'none';
+
+  // Bild
+  const imgBox = document.getElementById('qImage');
+  imgBox.innerHTML = '';
+  if (q.image) {
+    const img = document.createElement('img');
+    img.src = q.image;
+    img.className = 'qImage';
+    img.alt = 'Kartenausschnitt';
+    imgBox.appendChild(img);
+  } else if (q.type === 'search' || q.type === 'masstab') {
+    const ph = document.createElement('div');
+    ph.className = 'qImagePlaceholder';
+    ph.innerHTML = '<div class="pIcon">🗺️</div><div>Hier kannst du ein Kartenbild einfügen<br><small>Dateiname in der Fragen-Datenbank eintragen</small></div>';
+    imgBox.appendChild(ph);
+  }
+
+  // Body
+  const body = document.getElementById('qBody');
+  body.innerHTML = '';
+
+  if (q.type === 'multiple') {
+    renderMultiple(q, body);
+  } else if (q.type === 'masstab') {
+    renderMasstab(q, body);
+  } else if (q.type === 'search') {
+    renderSearch(q, body);
+  }
+
+  // Animate
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = ''; });
+}
+
+// ── Multiple Choice ──
+function renderMultiple(q, body) {
+  const grid = document.createElement('div');
+  grid.className = 'choicesGrid';
+  ['A','B','C','D'].forEach((ltr, i) => {
+    if (i >= q.choices.length) return;
+    const btn = document.createElement('button');
+    btn.className = 'choiceBtn';
+    btn.innerHTML = '<span class="choiceLtr">' + ltr + '</span>' + q.choices[i];
+    btn.onclick = () => checkMultiple(i, btn, q);
+    grid.appendChild(btn);
+  });
+  body.appendChild(grid);
+}
+
+function checkMultiple(i, btn, q) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.choiceBtn').forEach(b => b.disabled = true);
+  if (i === q.answer) {
+    btn.classList.add('correct');
+    correct++;
+    showFeedback(true, '✅ Richtig! ' + q.explanation);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.choiceBtn')[q.answer].classList.add('correct');
+    wrong++;
+    showFeedback(false, '❌ Leider falsch. ' + q.explanation);
+  }
+  document.getElementById('lsCorrect').textContent = '✅ ' + correct + ' richtig';
+  document.getElementById('lsWrong').textContent   = '❌ ' + wrong  + ' falsch';
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+// ── Maßstab ──
+function renderMasstab(q, body) {
+  const box = document.createElement('div');
+  box.className = 'masstabBox';
+
+  // Maßstabszahl: nur die Zahl NACH dem Doppelpunkt nehmen
+  const mzahl = parseInt(q.masstab.split(':')[1].replace(/\D/g,''));
+  const mzahlFmt = mzahl.toLocaleString('de-DE');
+
+  let formel = '';
+  if (!q.istUmgekehrt) {
+    // Maßstabszahl geteilt durch 1000 = km pro cm
+    const kmProCm = mzahl / 100000;
+    const kmProCmFmt = kmProCm.toLocaleString('de-DE');
+    formel = `
+    <div class="formelBox">
+      <div class="formelTitle">📐 So rechnest du:</div>
+      <div class="formelStep">
+        <span>Kartenstrecke (cm)</span>
+        <span class="fOp">×</span>
+        <span class="fNum">${kmProCmFmt}</span>
+        <span class="fOp">=</span>
+        <span class="fResult">km in Wirklichkeit</span>
+      </div>
+      <div style="margin:8px 0 6px;font-size:12px;color:var(--muted)">
+        (Bei Maßstab ${q.masstab} entspricht 1 cm auf der Karte = <strong style="color:var(--gold)">${kmProCmFmt} km</strong> in der Realität)
+      </div>
+      <div style="margin:10px 0;border-top:1px solid rgba(255,255,255,0.1)"></div>
+      <div class="formelTitle">🧮 Deine Aufgabe (setze ein):</div>
+      <div class="formelStep">
+        <span class="fNum">${q.gemessen} cm</span>
+        <span class="fOp">×</span>
+        <span class="fNum">${kmProCmFmt}</span>
+        <span class="fOp">=</span>
+        <span class="fBlank">? km</span>
+      </div>
+    </div>`;
+  } else {
+    const cmProKm = 100000 / mzahl;
+    formel = `
+    <div class="formelBox">
+      <div class="formelTitle">📐 So rechnest du (umgekehrt):</div>
+      <div class="formelStep">
+        <span>reale km</span>
+        <span class="fOp">÷</span>
+        <span class="fNum">${(mzahl/100000).toLocaleString('de-DE')}</span>
+        <span class="fOp">=</span>
+        <span class="fResult">cm auf der Karte</span>
+      </div>
+      <div style="margin:10px 0;border-top:1px solid rgba(255,255,255,0.1)"></div>
+      <div class="formelTitle">🧮 Deine Aufgabe (setze ein):</div>
+      <div class="formelStep">
+        <span class="fNum">${q.realInput} km</span>
+        <span class="fOp">÷</span>
+        <span class="fNum">${(mzahl/100000).toLocaleString('de-DE')}</span>
+        <span class="fOp">=</span>
+        <span class="fBlank">? cm</span>
+      </div>
+    </div>`;
+  }
+
+  box.innerHTML = `
+    <div class="masstabInfo">
+      📐 <strong>Maßstab:</strong> ${q.masstab} &nbsp;·&nbsp;
+      ${!q.istUmgekehrt
+        ? `📏 <strong>Kartenstrecke:</strong> ${q.gemessen} cm`
+        : `🌍 <strong>Reale Entfernung:</strong> ${q.realInput} km`}
+    </div>
+    ${formel}
+    <div class="inputRow">
+      <input class="numInput" id="masstabInput" type="number" placeholder="?" step="0.5" min="0">
+      <span class="inputUnit">${q.einheit}</span>
+    </div>
+    <div class="calcWrap">
+      <button class="calcToggle" onclick="toggleCalc()">🧮 Taschenrechner öffnen</button>
+      <div class="calculator" id="calculator">
+        <div class="calcDisplay">
+          <div class="calcExpr" id="calcExpr"></div>
+          <div class="calcVal"  id="calcVal">0</div>
+        </div>
+        <div class="calcBtns">
+          <button class="cBtn clr" onclick="calcAct('C')">C</button>
+          <button class="cBtn del" onclick="calcAct('DEL')">⌫</button>
+          <button class="cBtn op"  onclick="calcAct('%')">%</button>
+          <button class="cBtn op"  onclick="calcAct('/')">÷</button>
+          <button class="cBtn num" onclick="calcAct('7')">7</button>
+          <button class="cBtn num" onclick="calcAct('8')">8</button>
+          <button class="cBtn num" onclick="calcAct('9')">9</button>
+          <button class="cBtn op"  onclick="calcAct('*')">×</button>
+          <button class="cBtn num" onclick="calcAct('4')">4</button>
+          <button class="cBtn num" onclick="calcAct('5')">5</button>
+          <button class="cBtn num" onclick="calcAct('6')">6</button>
+          <button class="cBtn op"  onclick="calcAct('-')">−</button>
+          <button class="cBtn num" onclick="calcAct('1')">1</button>
+          <button class="cBtn num" onclick="calcAct('2')">2</button>
+          <button class="cBtn num" onclick="calcAct('3')">3</button>
+          <button class="cBtn op"  onclick="calcAct('+')">+</button>
+          <button class="cBtn num zero" onclick="calcAct('0')">0</button>
+          <button class="cBtn num" onclick="calcAct('.')">.</button>
+          <button class="cBtn eq"  onclick="calcAct('=')">＝</button>
+        </div>
+      </div>
+    </div>`;
+
+  body.appendChild(box);
+  document.getElementById('submitBtn').style.display = 'inline-block';
+  document.getElementById('masstabInput').focus();
+}
+
+// ── Taschenrechner Logik ──
+let calcExpr = '';
+let calcNew   = true;
+
+function toggleCalc() {
+  const c = document.getElementById('calculator');
+  c.classList.toggle('open');
+  const btn = document.querySelector('.calcToggle');
+  btn.textContent = c.classList.contains('open') ? '🧮 Taschenrechner schließen' : '🧮 Taschenrechner öffnen';
+}
+
+function calcAct(val) {
+  const exprEl = document.getElementById('calcExpr');
+  const valEl  = document.getElementById('calcVal');
+  if (!exprEl || !valEl) return;
+
+  if (val === 'C') {
+    calcExpr = '';
+    exprEl.textContent = '';
+    valEl.textContent  = '0';
+    return;
+  }
+  if (val === 'DEL') {
+    calcExpr = calcExpr.slice(0,-1);
+    exprEl.textContent = calcExpr || '';
+    valEl.textContent  = calcExpr || '0';
+    return;
+  }
+  if (val === '=') {
+    try {
+      const result = eval(calcExpr);
+      const rounded = parseFloat(result.toFixed(6));
+      exprEl.textContent = calcExpr + ' =';
+      valEl.textContent  = rounded;
+      calcExpr = String(rounded);
+    } catch(e) { valEl.textContent = 'Fehler'; }
+    return;
+  }
+  if (val === '%') {
+    try {
+      const result = eval(calcExpr) / 100;
+      calcExpr = String(parseFloat(result.toFixed(6)));
+      exprEl.textContent = calcExpr;
+      valEl.textContent  = calcExpr;
+    } catch(e) {}
+    return;
+  }
+  // Zahlen und Operatoren: nur anzeigen, NICHT live ausrechnen
+  calcExpr += val;
+  exprEl.textContent = calcExpr;
+  valEl.textContent  = calcExpr;
+}
+
+// ── Suchen ──
+function renderSearch(q, body) {
+  const box = document.createElement('div');
+  box.className = 'searchBox';
+  box.innerHTML = `
+    <div class="searchHint"><span class="atlasRef">${q.atlasHinweis}</span></div>
+    <input class="textInput" id="searchInput" type="text" placeholder="Deine Antwort..." autocomplete="off">
+  `;
+  body.appendChild(box);
+  document.getElementById('submitBtn').style.display = 'inline-block';
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkInput();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ANTWORT PRÜFEN (Eingabefelder)
+// ═══════════════════════════════════════════════════════════
+function checkInput() {
+  if (answered) return;
+  const q = questions[curQ];
+
+  if (q.type === 'masstab') {
+    const inp = document.getElementById('masstabInput');
+    const val = parseFloat(inp.value);
+    if (isNaN(val)) { inp.style.borderColor='#e74c3c'; return; }
+    answered = true;
+    inp.disabled = true;
+    document.getElementById('submitBtn').style.display = 'none';
+
+    const target = q.istUmgekehrt ? q.realKm : q.realKm;
+    const tol    = q.toleranz;
+    const isOk   = Math.abs(val - target) <= tol;
+
+    if (isOk) {
+      inp.style.borderColor = '#2ecc71';
+      correct++;
+      showFeedback(true, '✅ Richtig! ' + q.erklaerung);
+    } else {
+      inp.style.borderColor = '#e74c3c';
+      wrong++;
+      showFeedback(false, '❌ Leider falsch. Richtige Antwort: ' + target + ' ' + q.einheit + '\n' + q.erklaerung);
+    }
+    document.getElementById('lsCorrect').textContent = '✅ ' + correct + ' richtig';
+    document.getElementById('lsWrong').textContent   = '❌ ' + wrong  + ' falsch';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+
+  } else if (q.type === 'search') {
+    const inp = document.getElementById('searchInput');
+    const val = inp.value.trim().toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+    if (!val) { inp.style.borderColor='#e74c3c'; return; }
+    answered = true;
+    inp.disabled = true;
+    document.getElementById('submitBtn').style.display = 'none';
+
+    const isOk = q.answer.some(a => {
+      const norm = a.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+      return q.acceptPartial ? val.includes(norm) || norm.includes(val) : val === norm;
+    });
+
+    if (isOk) {
+      inp.style.borderColor = '#2ecc71';
+      correct++;
+      showFeedback(true, '✅ Richtig! ' + q.explanation);
+    } else {
+      inp.style.borderColor = '#e74c3c';
+      wrong++;
+      showFeedback(false, '❌ Leider falsch. Richtige Antwort: ' + q.answerDisplay + '\n' + q.explanation);
+    }
+    document.getElementById('lsCorrect').textContent = '✅ ' + correct + ' richtig';
+    document.getElementById('lsWrong').textContent   = '❌ ' + wrong  + ' falsch';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FEEDBACK
+// ═══════════════════════════════════════════════════════════
+function showFeedback(ok, msg) {
+  const fb = document.getElementById('feedback');
+  fb.textContent = msg;
+  fb.className = 'feedback ' + (ok ? 'correct' : 'wrong');
+  fb.style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  WEITER
+// ═══════════════════════════════════════════════════════════
+function nextQ() {
+  curQ++;
+  if (curQ >= questions.length) {
+    showResult();
+  } else {
+    renderQ();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ERGEBNIS
+// ═══════════════════════════════════════════════════════════
+function showResult() {
+  const mod    = MODULES[curModule];
+  const total  = questions.length;
+  const pct    = Math.round(correct / total * 100);
+  const passed = correct >= mod.passMark;
+
+  document.getElementById('progFill').style.width = '100%';
+
+  const emoji = pct>=90?'🏆':pct>=70?'🎉':pct>=50?'👍':'💪';
+  const title = pct>=90?'Hervorragend!':pct>=70?'Gut gemacht!':pct>=50?'Nicht schlecht!':'Weiter üben!';
+  const msg   = (playerName ? playerName + ': ' : '')
+    + (passed
+      ? 'Modul bestanden! Du hast ' + correct + ' von ' + total + ' richtig beantwortet.'
+      : correct + ' von ' + total + ' richtig. Du brauchst mind. ' + mod.passMark + ' zum Bestehen.');
+
+  document.getElementById('rEmoji').textContent = emoji;
+  document.getElementById('rTitle').textContent = title;
+  document.getElementById('rScore').textContent = correct + ' / ' + total;
+  document.getElementById('rMsg').textContent   = msg;
+
+  const badge = document.getElementById('passedBadge');
+  if (passed) {
+    badge.style.display = 'block';
+    document.getElementById('passedSub').textContent = mod.title + ' erfolgreich abgeschlossen!';
+    modsDone[curModule] = true;
+    totalScore += correct * 10;
+  } else {
+    badge.style.display = 'none';
+  }
+
+  // Score automatisch speichern
+  saveScore();
+
+  show('resultScreen');
+  updateCards();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODULE CARDS UPDATE
+// ═══════════════════════════════════════════════════════════
+function updateCards() {
+  Object.keys(MODULES).forEach(m => {
+    const badge = document.getElementById('mb-' + m);
+    if (!badge) return;
+    if (modsDone[m]) {
+      badge.textContent = '✅ Bestanden';
+      badge.className = 'mBadge badge-done';
+    }
+  });
+  const allDone = Object.keys(modsDone).length >= 4;
+  document.getElementById('certBtn').style.display = allDone ? 'inline-block' : 'none';
+}
+
+function showCert() {
+  alert('🎓 Herzlichen Glückwunsch!\n\nDu hast alle 4 Module des Atlas-Führerscheins bestanden!\n\nGesamtpunkte: ' + totalScore + '\n\nDein Lehrer kann dir jetzt den echten Führerschein aushändigen! 🏅');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HIGHSCORE
+// ═══════════════════════════════════════════════════════════
+let hsAllData  = [];  // alle Einträge gecacht
+let activeTab  = 'alle';
+
+const MODULE_LABELS = {
+  alle:       { label: 'Alle Module',         icon: '🌍' },
+  physisch:   { label: 'Physische Karte',      icon: '🏔️' },
+  masstab:    { label: 'Maßstab & Entfernung', icon: '📏' },
+  suchen:     { label: 'Atlas-Suchaufgaben',   icon: '🔍' },
+  thematisch: { label: 'Thematische Karten',   icon: '🌾' }
+};
+
+function openHighscore() {
+  document.getElementById('highscoreOverlay').classList.add('open');
+  // Speichern-Zeile nur zeigen wenn Modul gespielt aber noch nicht gespeichert
+  document.getElementById('saveRow').style.display = (curModule && !scoreSaved) ? 'flex' : 'none';
+  loadHS();
+}
+
+function closeHighscore() {
+  document.getElementById('highscoreOverlay').classList.remove('open');
+}
+
+// Enter-Taste im Name-Overlay
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('nameCardInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmName();
+  });
+});
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.hsTab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('hsSubTitle').textContent = MODULE_LABELS[tab].label;
+  renderHS();
+}
+
+function loadHS() {
+  document.getElementById('hsList').innerHTML = '<div style="color:var(--muted);padding:10px">Lade...</div>';
+  fetch(SCRIPT_URL)
+    .then(r => r.json())
+    .then(data => {
+      hsAllData = data || [];
+      renderHS();
+    })
+    .catch(() => {
+      document.getElementById('hsList').innerHTML = '<div style="color:var(--muted)">Fehler beim Laden.</div>';
+    });
+}
+
+function renderHS() {
+  if (!hsAllData.length) {
+    document.getElementById('hsList').innerHTML = '<div style="color:var(--muted)">Noch keine Einträge.</div>';
+    return;
+  }
+
+  let filtered = hsAllData;
+  if (activeTab !== 'alle') {
+    const icon = MODULES[activeTab].icon;
+    filtered = hsAllData.filter(row => row[0] && row[0].includes(icon));
+  }
+
+  // Namen bereinigen (Icon-Tag entfernen für Anzeige)
+  // Sortieren nach Punktzahl absteigend
+  filtered = filtered
+    .map(row => ({ rawName: row[0]||'', pts: parseInt(row[1])||0 }))
+    .sort((a,b) => b.pts - a.pts)
+    .slice(0, 15);
+
+  if (!filtered.length) {
+    document.getElementById('hsList').innerHTML = '<div style="color:var(--muted);padding:8px">Noch keine Einträge für dieses Modul.</div>';
+    return;
+  }
+
+  let html = '';
+  filtered.forEach((entry, i) => {
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    const rank  = medal || `<span style="color:var(--muted);font-size:14px">${i+1}.</span>`;
+    // Modulicon aus dem Namen extrahieren für Anzeige im "Alle"-Tab
+    const modMatch = entry.rawName.match(/\[(.+?)\]/);
+    const modIcon  = modMatch ? modMatch[1] : '';
+    const cleanName = entry.rawName.replace(/\s*\[.+?\]/, '');
+    const modBadge = (activeTab === 'alle' && modIcon)
+      ? `<span class="hsMod">${modIcon}</span>` : '';
+    html += `<div class="hsEntry">
+      <span class="hsRank">${rank}</span>
+      <span class="hsName">${cleanName}</span>
+      ${modBadge}
+      <span class="hsPts">${entry.pts} Pkt</span>
+    </div>`;
+  });
+  document.getElementById('hsList').innerHTML = html;
+}
+
+function saveScore() {
+  if (scoreSaved || !playerName) return;
+  scoreSaved = true;
+  const pts  = correct * 10;
+  const icon = MODULES[curModule]?.icon || '';
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ name: playerName + ' [' + icon + ']', score: pts })
+  });
+  document.getElementById('saveBtn').textContent = '✔ Gespeichert!';
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('saveRow').style.display = 'none';
+  setTimeout(() => { switchTab(curModule); loadHS(); }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+</script>
+</body>
+</html>
