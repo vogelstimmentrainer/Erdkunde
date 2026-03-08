@@ -1,0 +1,24 @@
+{
+  "name": "Atlas-Führerschein",
+  "short_name": "Atlas",
+  "description": "Diercke Weltatlas Lernspiel für Klasse 5/6",
+  "start_url": "./atlas-fuehrerschein.html",
+  "display": "standalone",
+  "background_color": "#0a1929",
+  "theme_color": "#0a1929",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "ErdkundeStart.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "ErdkundeStart.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
