@@ -44,10 +44,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 30px 20px;
-  background:
-    linear-gradient(to bottom, rgba(10,25,41,0.45) 0%, rgba(10,25,41,0.6) 100%),
-    url('ErdkundeStart.png') center center / contain no-repeat,
-    #0a1929;
+  background: radial-gradient(ellipse at 20% 50%, #0d3b6e 0%, #0a1929 60%);
   position: relative;
   overflow: hidden;
   gap: 8px;
@@ -55,6 +52,14 @@ body {
 
 .heroIcon { display: none; }
 @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+.heroLogo {
+  width: clamp(80px, 18vw, 130px);
+  height: auto;
+  animation: bob 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 18px rgba(30,136,229,0.35));
+  margin-bottom: 2px;
+}
 
 .heroTitle {
   font-family: 'Baloo 2', cursive;
@@ -731,7 +736,7 @@ body {
      STARTSCREEN
 ════════════════════════════════ -->
 <div id="startScreen" class="screen active">
-  <div class="heroIcon">🌍</div>
+  <img src="ErdkundeStart.png" class="heroLogo" alt="Atlas-Führerschein Logo">
   <div class="heroTitle">Atlas-Führerschein</div>
   <div class="heroSub">Diercke Weltatlas · Klasse 5 / 6</div>
 
